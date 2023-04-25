@@ -30,6 +30,7 @@ func generateIV(size int) ([]byte, error) {
 }
 
 func encrypt(key, iv, plaintext []byte) ([]byte, error) {
+	// Create AES block
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -41,6 +42,7 @@ func encrypt(key, iv, plaintext []byte) ([]byte, error) {
 	// Encrypt the plaintext
 	ciphertext := make([]byte, len(plaintext))
 	stream.XORKeyStream(ciphertext, plaintext)
+
 	return ciphertext, nil
 }
 
@@ -64,6 +66,8 @@ func decrypt(key, iv, ciphertext []byte) ([]byte, error) {
 func main() {
 	plaintext := []byte("Hello, world!")
 
+	fmt.Printf("Plaintext: %s\n", plaintext)
+
 	// Create the AES cipher using a 32 byte key
 	key, err := generateAESKey(32)
 	if err != nil {
@@ -82,13 +86,13 @@ func main() {
 		panic(err)
 	}
 
+	fmt.Printf("Encrypted: %x\n", ciphertext)
+
 	// Decrypt the ciphertext
 	decrypted, err := decrypt(key, iv, ciphertext)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Plaintext: %s\n", plaintext)
-	fmt.Printf("Encrypted: %x\n", ciphertext)
 	fmt.Printf("Decrypted: %s\n", decrypted)
 }
