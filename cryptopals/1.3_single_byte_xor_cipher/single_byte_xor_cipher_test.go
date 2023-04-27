@@ -63,7 +63,11 @@ func Test_readFile(t *testing.T) {
 					t.Logf("Unexpected error creating temporary file: %v", err)
 					return
 				}
-				defer os.Remove(tempFile.Name())
+				defer func() {
+					if err := os.Remove(tempFile.Name()); err != nil {
+						t.Logf("Unexpected error removing temporary file: %v", err)
+					}
+				}()
 
 				_, err = tempFile.Write(tt.want)
 				if err != nil {
@@ -71,7 +75,9 @@ func Test_readFile(t *testing.T) {
 					return
 				}
 
-				tempFile.Close()
+				if err := tempFile.Close(); err != nil {
+					t.Logf("Unexpected error closing temporary file: %v", err)
+				}
 			}
 
 			// Test reading the temporary file
@@ -214,7 +220,7 @@ func Test_xor(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Test xor run successfully",
+			name: "Test 1.2_xor run successfully",
 			args: args{
 				b1: []byte{1, 2, 3},
 				b2: []byte{4, 5, 6},
@@ -245,11 +251,11 @@ func Test_xor(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := xor(tt.args.b1, tt.args.b2)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("xor() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("1.2_xor() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("xor() got = %v, want %v", got, tt.want)
+				t.Errorf("1.2_xor() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -312,6 +318,8 @@ func Test_crackXorCipher(t *testing.T) {
 func Test_Crack(t *testing.T) {
 	type args struct {
 		ciphertext string
+		filePath   string
+		dirPath    string
 	}
 	tests := []struct {
 		name    string
@@ -323,6 +331,8 @@ func Test_Crack(t *testing.T) {
 			name: "Test Crack run successfully",
 			args: args{
 				ciphertext: "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",
+				filePath:   "frequency.txt",
+				dirPath:    "",
 			},
 			want:    "Cooking MC's like a pound of bacon",
 			wantErr: false,
@@ -330,7 +340,7 @@ func Test_Crack(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Crack(tt.args.ciphertext)
+			got, err := Crack(tt.args.ciphertext, tt.args.filePath, tt.args.dirPath)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Crack() error = %v, wantErr %v", err, tt.wantErr)
 				return

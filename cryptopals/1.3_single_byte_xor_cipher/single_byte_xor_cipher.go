@@ -38,7 +38,11 @@ func readFile(filePath string, dirPath string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error opening file: %v", err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			_ = fmt.Errorf("error when closing file: %v", err)
+		}
+	}()
 
 	// Create a byte buffer to store the file contents
 	var buffer bytes.Buffer
@@ -76,7 +80,7 @@ func asciiFrequency(data []byte) map[byte]float64 {
 	}
 
 	for _, b := range data {
-		if b >= 0 && b <= 127 {
+		if b <= 127 {
 			countMap[b]++
 		}
 	}
@@ -158,11 +162,9 @@ func crackXorCipher(cipherbytes []byte, freqs map[byte]float64) ([]byte, error) 
 	return bestGuess, nil
 }
 
-var ciphertext = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
-
-func Crack(ciphertext string) (string, error) {
-	// Create frequencies from
-	fileContent, err := readFile("frequency.txt", "")
+func Crack(ciphertext string, filePath, dirPath string) (string, error) {
+	// Create frequencies
+	fileContent, err := readFile(filePath, dirPath)
 	if err != nil {
 		return "", err
 	}

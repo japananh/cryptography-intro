@@ -63,11 +63,11 @@ func Test_Xor(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Xor(tt.args.s1, tt.args.s2)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("xor() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("1.2_xor() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("xor() got = %v, want %v", got, tt.want)
+				t.Errorf("1.2_xor() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
