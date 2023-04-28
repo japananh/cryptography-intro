@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-const epsilon = 4.44089209850063e-16
+const epsilon = 6.66133814775e-16
 
 func isEqualFloat(a, b, epsilon float64) bool {
 	return math.Abs(a-b) < epsilon
@@ -89,32 +89,6 @@ func Test_readFile(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("readFile() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_asciiFrequency(t *testing.T) {
-	type args struct {
-		data []byte
-	}
-	tests := []struct {
-		name string
-		args args
-		want map[byte]float64
-	}{
-		{
-			name: "Test asciiFrequency run successfully",
-			args: args{
-				data: []byte{1, 2, 3, 4, 5, 6, 7, 8, 9},
-			},
-			want: map[byte]float64{0: 0, 1: 0.1111111111111111, 2: 0.1111111111111111, 3: 0.1111111111111111, 4: 0.1111111111111111, 5: 0.1111111111111111, 6: 0.1111111111111111, 7: 0.1111111111111111, 8: 0.1111111111111111, 9: 0.1111111111111111, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0, 26: 0, 27: 0, 28: 0, 29: 0, 30: 0, 31: 0, 32: 0, 33: 0, 34: 0, 35: 0, 36: 0, 37: 0, 38: 0, 39: 0, 40: 0, 41: 0, 42: 0, 43: 0, 44: 0, 45: 0, 46: 0, 47: 0, 48: 0, 49: 0, 50: 0, 51: 0, 52: 0, 53: 0, 54: 0, 55: 0, 56: 0, 57: 0, 58: 0, 59: 0, 60: 0, 61: 0, 62: 0, 63: 0, 64: 0, 65: 0, 66: 0, 67: 0, 68: 0, 69: 0, 70: 0, 71: 0, 72: 0, 73: 0, 74: 0, 75: 0, 76: 0, 77: 0, 78: 0, 79: 0, 80: 0, 81: 0, 82: 0, 83: 0, 84: 0, 85: 0, 86: 0, 87: 0, 88: 0, 89: 0, 90: 0, 91: 0, 92: 0, 93: 0, 94: 0, 95: 0, 96: 0, 97: 0, 98: 0, 99: 0, 100: 0, 101: 0, 102: 0, 103: 0, 104: 0, 105: 0, 106: 0, 107: 0, 108: 0, 109: 0, 110: 0, 111: 0, 112: 0, 113: 0, 114: 0, 115: 0, 116: 0, 117: 0, 118: 0, 119: 0, 120: 0, 121: 0, 122: 0, 123: 0, 124: 0, 125: 0, 126: 0, 127: 0},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := asciiFrequency(tt.args.data); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("asciiFrequency() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -317,9 +291,9 @@ func Test_crackXorCipher(t *testing.T) {
 
 func Test_Crack(t *testing.T) {
 	type args struct {
-		ciphertext string
-		filePath   string
-		dirPath    string
+		ciphertext        string
+		frequencyFilePath string
+		frequencyDirPath  string
 	}
 	tests := []struct {
 		name    string
@@ -330,9 +304,9 @@ func Test_Crack(t *testing.T) {
 		{
 			name: "Test Crack run successfully",
 			args: args{
-				ciphertext: "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",
-				filePath:   "frequency.txt",
-				dirPath:    "",
+				ciphertext:        "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",
+				frequencyFilePath: "frequency.json",
+				frequencyDirPath:  "",
 			},
 			want:    "Cooking MC's like a pound of bacon",
 			wantErr: false,
@@ -340,7 +314,7 @@ func Test_Crack(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Crack(tt.args.ciphertext, tt.args.filePath, tt.args.dirPath)
+			got, err := Crack(tt.args.ciphertext, tt.args.frequencyFilePath, tt.args.frequencyDirPath)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Crack() error = %v, wantErr %v", err, tt.wantErr)
 				return

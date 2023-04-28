@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"math"
 	"os"
+	"path"
 )
 
 func readFile(filePath string, dirPath string) ([]byte, error) {
@@ -40,7 +42,7 @@ func readFile(filePath string, dirPath string) ([]byte, error) {
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
-			_ = fmt.Errorf("error when closing file: %v", err)
+			fmt.Printf("error when closing file: %v\n", err)
 		}
 	}()
 
@@ -66,30 +68,6 @@ func readFile(filePath string, dirPath string) ([]byte, error) {
 
 	// Return the contents of the file as a slice of bytes
 	return buffer.Bytes(), nil
-}
-
-func asciiFrequency(data []byte) map[byte]float64 {
-	countMap := make(map[byte]int)
-	freqMap := make(map[byte]float64)
-	totalChars := len(data)
-
-	// Create an array byte of all ASCII characters
-	// ASCII code runs from 0 (`null`) to 127 (`del`)
-	for i := 0; i <= 127; i++ {
-		countMap[byte(i)] = 0
-	}
-
-	for _, b := range data {
-		if b <= 127 {
-			countMap[b]++
-		}
-	}
-
-	for k, v := range countMap {
-		freqMap[k] = float64(v) / float64(totalChars)
-	}
-
-	return freqMap
 }
 
 func getByteFrequency(b byte, data []byte) float64 {
@@ -162,21 +140,25 @@ func crackXorCipher(cipherbytes []byte, freqs map[byte]float64) ([]byte, error) 
 	return bestGuess, nil
 }
 
-func Crack(ciphertext string, filePath, dirPath string) (string, error) {
-	// Create frequencies
-	fileContent, err := readFile(filePath, dirPath)
+func Crack(ciphertext string, frequencyFilePath string, frequencyDirPath string) (string, error) {
+	// Read frequency file
+	jsonData, err := os.ReadFile(path.Join(frequencyDirPath, frequencyFilePath))
 	if err != nil {
 		return "", err
 	}
-	freqs := asciiFrequency(fileContent)
 
-	// Decode hex string to byte array
+	freqs := make(map[byte]float64)
+	if err := json.Unmarshal(jsonData, &freqs); err != nil {
+		return "", err
+	}
+
+	// Decode ciphertext from hex string to byte array
 	cipherBytes, err := hex.DecodeString(ciphertext)
 	if err != nil {
 		return "", err
 	}
 
-	// Crack cipher
+	// Crack ciphertext
 	plaintext, err := crackXorCipher(cipherBytes, freqs)
 	if err != nil {
 		return "", err
