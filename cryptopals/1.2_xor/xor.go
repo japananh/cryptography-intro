@@ -5,17 +5,17 @@ import (
 	"fmt"
 )
 
-func Xor(s1, s2 string) (string, error) {
-	if s1 == "" || s2 == "" {
+func Xor(hexStr1, hexStr2 string) (string, error) {
+	if hexStr1 == "" || hexStr2 == "" {
 		return "", fmt.Errorf("input cannot be empty")
 	}
 
-	b1, err := hex.DecodeString(s1)
+	b1, err := hex.DecodeString(hexStr1)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode s1: %v", err)
 	}
 
-	b2, err := hex.DecodeString(s2)
+	b2, err := hex.DecodeString(hexStr2)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode s2: %v", err)
 	}
