@@ -302,13 +302,23 @@ func Test_Crack(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Test Crack run successfully",
+			name: "Test Crack run successfully 1",
 			args: args{
 				ciphertext:        "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",
 				frequencyFilePath: "frequency.json",
 				frequencyDirPath:  "",
 			},
 			want:    "Cooking MC's like a pound of bacon",
+			wantErr: false,
+		},
+		{
+			name: "Test Crack run successfully 2",
+			args: args{
+				ciphertext:        "7b5a4215415d544115415d5015455447414c155c46155f4058455c5b523f",
+				frequencyFilePath: "frequency.json",
+				frequencyDirPath:  "",
+			},
+			want:    "Now that the party is jumping\n",
 			wantErr: false,
 		},
 	}
