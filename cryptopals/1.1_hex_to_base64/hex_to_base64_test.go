@@ -1,4 +1,4 @@
-package hex_to_base64
+package hextobase64
 
 import "testing"
 

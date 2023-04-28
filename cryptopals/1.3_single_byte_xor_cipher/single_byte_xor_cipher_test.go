@@ -1,4 +1,4 @@
-package single_byte_xor_cipher
+package singlebytexorcipher
 
 import (
 	"math"
