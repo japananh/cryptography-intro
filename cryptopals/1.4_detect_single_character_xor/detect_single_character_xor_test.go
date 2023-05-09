@@ -26,7 +26,7 @@ func Test_isEnglish(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "Test input in France",
+			name: "Test input in Japanese",
 			args: args{
 				s: "愛しています (aishiteimasu)",
 			},

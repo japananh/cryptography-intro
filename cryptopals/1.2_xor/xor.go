@@ -12,16 +12,16 @@ func Xor(hexStr1, hexStr2 string) (string, error) {
 
 	b1, err := hex.DecodeString(hexStr1)
 	if err != nil {
-		return "", fmt.Errorf("failed to decode s1: %v", err)
+		return "", fmt.Errorf("error when decode first string: %v", err)
 	}
 
 	b2, err := hex.DecodeString(hexStr2)
 	if err != nil {
-		return "", fmt.Errorf("failed to decode s2: %v", err)
+		return "", fmt.Errorf("error when decode second string: %v", err)
 	}
 
 	if len(b1) != len(b2) {
-		return "", fmt.Errorf("s1 and s2 must have the same length")
+		return "", fmt.Errorf("input must have the same length")
 	}
 
 	out := make([]byte, len(b1))
