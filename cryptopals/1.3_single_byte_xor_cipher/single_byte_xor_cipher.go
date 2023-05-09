@@ -3,10 +3,7 @@ package singlebytexorcipher
 import (
 	"bytes"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
-	"os"
-	"path"
 
 	"cryptography-challenge/utils"
 )
@@ -24,56 +21,64 @@ func Xor(b1, b2 []byte) ([]byte, error) {
 	return out, nil
 }
 
-func crackXorCipher(cipherBytes []byte, englishLetterFreqs map[byte]float64) ([]byte, error) {
+// Crack Breaks single-byte XOR cipher
+func Crack(cipherBytes []byte, englishLetterFreqs map[byte]float64) (plaintext []byte, key byte, err error) {
 	cipherByteLen := len(cipherBytes)
 	if cipherByteLen == 0 {
-		return nil, fmt.Errorf("error input must not be empty")
+		return nil, 0, fmt.Errorf("error input must not be empty")
 	}
 
-	bestGuess := make([]byte, cipherByteLen)
 	bestScore := 0.0
 
 	for candidateKey := 0; candidateKey < 256; candidateKey++ {
 		fullKey := bytes.Repeat([]byte{byte(candidateKey)}, cipherByteLen)
-		plaintext, err := Xor(fullKey, cipherBytes)
+		guess, err := Xor(fullKey, cipherBytes)
 		if err != nil {
 			fmt.Printf("error xoring ciphertext and full key at candidate key %q: %v", candidateKey, err)
 			continue
 		}
-		score := utils.FrequencyScore(plaintext, englishLetterFreqs)
+		score := utils.FrequencyScore(guess, englishLetterFreqs)
 
 		if score < bestScore || candidateKey == 0 {
-			bestGuess = plaintext
+			plaintext = guess
 			bestScore = score
+			key = byte(candidateKey)
 		}
 	}
 
-	return bestGuess, nil
+	return plaintext, key, nil
 }
 
-func Crack(ciphertext string, frequencyFilePath string, frequencyDirPath string) (string, error) {
-	// Read frequency file
-	jsonData, err := os.ReadFile(path.Join(frequencyDirPath, frequencyFilePath))
-	if err != nil {
-		return "", err
-	}
-
-	freqs := make(map[byte]float64)
-	if err := json.Unmarshal(jsonData, &freqs); err != nil {
-		return "", err
+// CrackFromHex Breaks single-byte XOR cipher from hex input
+func CrackFromHex(ciphertext string, englishLetterFreqs map[byte]float64) (plaintext []byte, key byte, err error) {
+	if ciphertext == "" {
+		return nil, 0, fmt.Errorf("error input must not be empty")
 	}
 
 	// Decode ciphertext from hex string to byte array
 	cipherBytes, err := hex.DecodeString(ciphertext)
 	if err != nil {
-		return "", err
+		fmt.Printf("error when decoding %q: %v", ciphertext, err)
+		return nil, 0, fmt.Errorf("error when decoding %q: %v", ciphertext, err)
 	}
 
-	// Crack ciphertext
-	plaintext, err := crackXorCipher(cipherBytes, freqs)
-	if err != nil {
-		return "", err
+	bestScore := 0.0
+
+	for candidateKey := 0; candidateKey < 256; candidateKey++ {
+		fullKey := bytes.Repeat([]byte{byte(candidateKey)}, len(cipherBytes))
+		guess, err := Xor(fullKey, cipherBytes)
+		if err != nil {
+			fmt.Printf("error xoring ciphertext and full key at candidate key %q: %v", candidateKey, err)
+			continue
+		}
+		score := utils.FrequencyScore(guess, englishLetterFreqs)
+
+		if score < bestScore || candidateKey == 0 {
+			plaintext = guess
+			bestScore = score
+			key = byte(candidateKey)
+		}
 	}
 
-	return string(plaintext), nil
+	return plaintext, key, nil
 }
