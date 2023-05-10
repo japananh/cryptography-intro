@@ -240,3 +240,62 @@ func Test_IsEqualFloat(t *testing.T) {
 		})
 	}
 }
+
+func Test_Pkcs7Pad(t *testing.T) {
+	type args struct {
+		input []byte
+	}
+	tests := []struct {
+		name string
+		args args
+		want []byte
+	}{
+		{
+			name: "Test pkcs7Pad run successfully",
+			args: args{
+				input: []byte{72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33},
+			},
+			want: []byte{72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33, 4, 4, 4, 4},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Pkcs7Pad(tt.args.input); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("pkcs7Pad() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_Pkcs7Unpad(t *testing.T) {
+	type args struct {
+		input []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "Test pkcs7Unpad run successfully",
+			args: args{
+				input: []byte{72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33, 4, 4, 4, 4},
+			},
+			want:    []byte{72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Pkcs7Unpad(tt.args.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("pkcs7Unpad() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("pkcs7Unpad() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
