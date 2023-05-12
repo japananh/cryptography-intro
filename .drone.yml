@@ -1,0 +1,15 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: test
+    image: golang
+    commands:
+      - cd cryptoplals
+      - go test ./...
+    when:
+      branch:
+        - main
+      event:
+        - push
